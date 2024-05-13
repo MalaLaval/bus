@@ -1,0 +1,70 @@
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <sstream>
+#include <map>
+#include <vector>
+using namespace std;
+
+// Function to split a string based on delimiter
+vector<string> split(const string& s, char delimiter) {
+    vector<string> tokens;
+    string token;
+    istringstream tokenStream(s);
+    while (getline(tokenStream, token, delimiter)) {
+        tokens.push_back(token);
+    }
+    return tokens;
+}
+
+int main() {
+    // Maps for storing times for each direction
+    map<string, map<string, string>> timetable1, timetable2;
+
+    // Reading data from file
+    ifstream file("80x.txt");
+    if (!file.is_open()) {
+        cerr << "Cannot open the file." << endl;
+        return 1;
+    }
+
+    string line;
+    int direction = 1; // Variable to track direction (1 or 2)
+
+    while (getline(file, line)) {
+        if (line.empty()) {
+            // If an empty line is encountered, switch direction
+            direction = 2;
+            continue;
+        }
+
+        vector<string> tokens = split(line, '\t');
+        string stop = tokens[0];
+        for (size_t i = 1; i < tokens.size(); ++i) {
+            if (direction == 1) {
+                timetable1[stop]["departure"] = tokens[i];
+            }
+            else {
+                timetable2[stop]["departure"] = tokens[i];
+            }
+        }
+    }
+
+    // User input for stops
+    string source, destination;
+    cout << "Enter the stop you want to depart from: ";
+    cin >> source;
+    cout << "Enter the destination stop: ";
+    cin >> destination;
+
+    // Displaying times for the specified stops
+    cout << "Direction 1: " << endl;
+    cout << "Departure from " << source << ": " << timetable1[source]["departure"] << endl;
+    cout << "Arrival at " << destination << ": " << timetable1[destination]["departure"] << endl;
+
+    cout << "Direction 2: " << endl;
+    cout << "Departure from " << source << ": " << timetable2[source]["departure"] << endl;
+    cout << "Arrival at " << destination << ": " << timetable2[destination]["departure"] << endl;
+
+    return 0;
+}
